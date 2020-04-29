@@ -12,10 +12,12 @@ class Diver extends Entity {
     constructor(scene, x, y, key) {
         super(scene, x, y, key, 'diver');
 
-        
+        this.body.setGravityY(20);
     }
-
 }
+
+
+
 
 
 class Player extends Entity {
