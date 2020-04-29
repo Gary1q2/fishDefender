@@ -13,6 +13,8 @@ class Diver extends Entity {
         super(scene, x, y, key, 'diver');
 
         this.body.setGravityY(20);
+
+
     }
 }
 
@@ -22,13 +24,15 @@ class Diver extends Entity {
 
 class Player extends Entity {
     constructor(scene, x, y, key) {
-        super(scene, x, y, key, 'player');
+        super(scene, x, y, key);
 
         this.targetX = -1;
         this.targetY = -1;
         this.speed = 60;
 
         this.stopBuffer = 1;
+
+        this.play('spr_player');
     }
 
     // Move to target destination
