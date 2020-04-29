@@ -8,14 +8,25 @@ class Entity extends Phaser.GameObjects.Sprite {
     }
 }
 
+class Diver extends Entity {
+    constructor(scene, x, y, key) {
+        super(scene, x, y, key, 'diver');
+
+        
+    }
+
+}
+
+
 class Player extends Entity {
     constructor(scene, x, y, key) {
         super(scene, x, y, key, 'player');
 
         this.targetX = -1;
         this.targetY = -1;
-        this.targetAngle = -1;
         this.speed = 60;
+
+        this.stopBuffer = 1;
     }
 
     // Move to target destination
@@ -23,24 +34,26 @@ class Player extends Entity {
         this.targetX = destX;
         this.targetY = destY;
 
-        if (destX <= this.x) {
+        // Point fish in the right direction
+        /*if (destX <= this.x) {
             this.flipX = true;
         } else {
             this.flipX = false;
-        }
+        }*/
 
-
+        // Make fish move to destination
         var distX = this.targetX - this.x;
         var distY = this.targetY - this.y;
         var angle = Math.atan2(distY, distX);
-
         this.body.setVelocity(this.speed * Math.cos(angle), this.speed * Math.sin(angle));
+        this.angle = Phaser.Math.Angle.Between(this.x, this.y, this.targetX, this.targetY) * 180/Math.PI;
+        console.log("angle = " + this.angle);
     }
 
     update() {
         
-        // Check if destination reached
-        while ((Math.abs(this.targetX - this.x) < 2) && (Math.abs(this.targetY - this.y) < 2)) {
+        // Stop fish once it reaches destination
+        while ((Math.abs(this.targetX - this.x) < this.stopBuffer) && (Math.abs(this.targetY - this.y) < this.stopBuffer)) {
             this.targetX = -1;
             this.targetY = -1;
             this.body.setVelocity(0, 0);
