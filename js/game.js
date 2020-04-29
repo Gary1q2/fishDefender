@@ -2,9 +2,9 @@ var config = {
     type: Phaser.WEBGL,
     width: 400,
     height: 200,
-    backgroundColour: "black",
+    backgroundColour: 'black',
     physics: {
-        default: "arcade",
+        default: 'arcade',
         arcade: {
             gravity: { x: 0, y: 0 }
         }
