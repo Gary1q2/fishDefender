@@ -12,32 +12,38 @@ class Player extends Entity {
     constructor(scene, x, y, key) {
         super(scene, x, y, key, 'player');
 
-        this.setData('targetX', -1);
-        this.setData('targetY', -1);
-        this.setData('targetAngle', -1);
-        this.setData('speed', 50);
+        this.targetX = -1;
+        this.targetY = -1;
+        this.targetAngle = -1;
+        this.speed = 60;
     }
 
+    // Move to target destination
+    moveTo(destX, destY) {
+        this.targetX = destX;
+        this.targetY = destY;
 
-    setTargetDest(destX, destY) {
-        this.setData('targetX', destX);
-        this.setData('targetY', destY);
+        if (destX <= this.x) {
+            this.flipX = true;
+        } else {
+            this.flipX = false;
+        }
 
-        var distX = this.getData('targetX') - this.x;
-        var distY = this.getData('targetY') - this.y;
+
+        var distX = this.targetX - this.x;
+        var distY = this.targetY - this.y;
         var angle = Math.atan2(distY, distX);
 
-        this.body.setVelocity(this.getData('speed') * Math.cos(angle), this.getData('speed') * Math.sin(angle));
-
+        this.body.setVelocity(this.speed * Math.cos(angle), this.speed * Math.sin(angle));
     }
 
     update() {
         
         // Check if destination reached
-        while ((Math.abs(this.getData('targetX') - this.x) < 10) && (Math.abs(this.getData('targetY') - this.y) < 10)) {
+        while ((Math.abs(this.targetX - this.x) < 2) && (Math.abs(this.targetY - this.y) < 2)) {
+            this.targetX = -1;
+            this.targetY = -1;
             this.body.setVelocity(0, 0);
-            this.setData('targetX', -1);
-            this.setData('targetY', -1);
         }
     }
 }
