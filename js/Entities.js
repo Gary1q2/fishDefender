@@ -4,6 +4,7 @@ class Entity extends Phaser.GameObjects.Sprite {
 
         this.scene = scene;
         this.scene.add.existing(this);
+        this.scene.physics.world.enableBody(this, 0)
     }
 }
 
@@ -14,67 +15,29 @@ class Player extends Entity {
         this.setData('targetX', -1);
         this.setData('targetY', -1);
         this.setData('targetAngle', -1);
-        this.setData('speed', 1);
+        this.setData('speed', 50);
     }
+
 
     setTargetDest(destX, destY) {
         this.setData('targetX', destX);
         this.setData('targetY', destY);
 
-        let yDist = Math.abs(this.getData('targetY') - this.y);
-        let xDist = Math.abs(this.getData('targetX') - this.x);
-        let targetAngle = Math.atan(yDist/xDist);
-        this.setData('targetAngle', targetAngle);
+        var distX = this.getData('targetX') - this.x;
+        var distY = this.getData('targetY') - this.y;
+        var angle = Math.atan2(distY, distX);
 
+        this.body.setVelocity(this.getData('speed') * Math.cos(angle), this.getData('speed') * Math.sin(angle));
 
-        console.log("target angle = " + this.getData('targetAngle'));
-        console.log('set target @' + destX+','+destY);
-        console.log("x moving = " + this.getData('speed') * Math.cos(targetAngle));
-        console.log("y moving = " + this.getData('speed') * Math.sin(targetAngle));
     }
 
-
-    move() {
-        let xMove = this.getData('speed') * Math.cos(this.getData('targetAngle'))
-        let yMove = this.getData('speed') * Math.sin(this.getData('targetAngle'))
-
-        // Move to destination
-        if (this.getData('targetX') != -1 && this.getData('targetY') != -1) {
-
-            // Move x position
-            if (Math.abs(this.getData('targetX') - this.x) > xMove) {
-                if (this.x < this.getData('targetX')) {
-                    this.x += xMove;
-                } else if (this.x > this.getData('targetX')) {
-                    this.x -= xMove;
-                }
-            } else {
-                this.x = this.getData('targetX');
-            }
-
-            // Move y position
-            if (Math.abs(this.getData('targetY') - this.y) > yMove) {
-                if (this.y < this.getData('targetY')) {
-                    this.y += yMove;
-                } else if (this.y > this.getData('targetY')) {
-                    this.y -= yMove;
-                }
-            } else {
-                this.y = this.getData('targetY');
-            }
-
-        // Reached destination
-        } else {
+    update() {
+        
+        // Check if destination reached
+        while ((Math.abs(this.getData('targetX') - this.x) < 10) && (Math.abs(this.getData('targetY') - this.y) < 10)) {
+            this.body.setVelocity(0, 0);
             this.setData('targetX', -1);
             this.setData('targetY', -1);
         }
-    }
-
-
-
-    update() {
-
-        this.move();
-        
     }
 }

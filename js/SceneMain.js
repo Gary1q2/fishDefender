@@ -11,6 +11,7 @@ class SceneMain extends Phaser.Scene {
     }
 
     create() {
+
         this.background = this.add.sprite(this.game.config.width/2, this.game.config.height/2, 'spr_background');
 
         this.player = new Player(this, this.game.config.width/2, this.game.config.height/2, 'spr_player');
@@ -26,9 +27,14 @@ class SceneMain extends Phaser.Scene {
             console.log('up');
         }, this);
 
+
+
+        // Display FPS
+        this.fps = this.add.text(5, 5, this.game.loop.actualFps);
     }
 
     update() {
         this.player.update();
+
     }
 }
