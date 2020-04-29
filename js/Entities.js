@@ -35,6 +35,14 @@ class Player extends Entity {
         this.play('spr_player');
     }
 
+    // Stop player moving
+    stopMove() {
+        this.targetX = -1;
+        this.targetY = -1;
+        this.body.setVelocity(0, 0);
+    }
+
+
     // Move to target destination
     moveTo(destX, destY) {
         this.targetX = destX;
@@ -59,10 +67,10 @@ class Player extends Entity {
     update() {
         
         // Stop fish once it reaches destination
-        while ((Math.abs(this.targetX - this.x) < this.stopBuffer) && (Math.abs(this.targetY - this.y) < this.stopBuffer)) {
-            this.targetX = -1;
-            this.targetY = -1;
-            this.body.setVelocity(0, 0);
-        }
+        //while ((Math.abs(this.targetX - this.x) < this.stopBuffer) && (Math.abs(this.targetY - this.y) < this.stopBuffer)) {
+        //    this.targetX = -1;
+        //    this.targetY = -1;
+        //    this.body.setVelocity(0, 0);
+        //}
     }
 }

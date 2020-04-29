@@ -61,12 +61,9 @@ class SceneMain extends Phaser.Scene {
 
 
         // Mouse inputs
-        this.input.on('pointerdown', function(pointer) {
-            console.log('down');
-            this.player.moveTo(Math.round(pointer.x), Math.round(pointer.y));
-        }, this);
         this.input.on('pointerup', function(pointer) {
             console.log('up');
+            this.player.stopMove();
         }, this);
 
 
@@ -81,5 +78,9 @@ class SceneMain extends Phaser.Scene {
     update() {
         this.player.update();
 
+        var mouse = this.input.activePointer
+        if (mouse.isDown) {
+            this.player.moveTo(Math.round(mouse.x), Math.round(mouse.y));
+        }
     }
 }
