@@ -18,10 +18,15 @@ class SceneMain extends Phaser.Scene {
 
         // Creating animations
         this.anims.create({
-            key: 'spr_player',
-            frames: this.anims.generateFrameNumbers('spr_player'),
+            key: 'spr_playerIdle',
+            frames: this.anims.generateFrameNumbers('spr_player', {start:0, end:1}),
             frameRate: 2,
             repeat: -1
+        });
+        this.anims.create({
+            key: 'spr_playerBite',
+            frames: this.anims.generateFrameNumbers('spr_player', {start:2, end:3}),
+            frameRate: 3
         });
 
 
@@ -36,8 +41,6 @@ class SceneMain extends Phaser.Scene {
 
         this.chest = this.add.sprite(this.game.config.width/2, this.game.config.height-55, 'spr_chest');
         this.player = new Player(this, this.game.config.width/2, this.game.config.height/2, 'spr_player');
-
-
 
 
         // Adding diver and ground collisions
@@ -73,16 +76,23 @@ class SceneMain extends Phaser.Scene {
         // Display FPS
         this.fps = this.add.text(5, 5, this.game.loop.actualFps);
 
-
+        this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
     }
 
     update() {
         this.player.update();
 
+        // Detect mouse click
         var mouse = this.input.activePointer
         if (mouse.isDown) {
             this.player.moveTo(Math.round(mouse.x), Math.round(mouse.y));
+        }
+
+        // Detect Q key pressed
+        if (this.keyQ.isDown) {
+            console.log("pressed Q");
+            this.player.bite();
         }
     }
 }

@@ -39,10 +39,20 @@ class Player extends Entity {
         this.targetY = -1;
         this.speed = 60;
 
-        this.stopBuffer = 1;
+        this.stopBuffer = ;
 
-        this.play('spr_player');
+        this.play('spr_playerIdle');
     }
+
+    bite() {
+        this.play('spr_playerBite');
+
+        this.once('animationcomplete', function() {
+            console.log('animation done');
+            this.play('spr_playerIdle');
+        });
+    }
+
 
     // Stop player moving
     stopMove() {
