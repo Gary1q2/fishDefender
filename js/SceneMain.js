@@ -8,13 +8,22 @@ class SceneMain extends Phaser.Scene {
             frameWidth: 16,
             frameHeight: 16
         });
-        this.load.image('spr_diver', 'img/diver.png');
+        this.load.spritesheet('spr_diver', 'img/diver.png', {
+            frameWidth: 16,
+            frameHeight: 16
+        });
         this.load.image('spr_chest', 'img/chest.png');
         this.load.image('spr_background', 'img/background.png');
         this.load.image('spr_ground', 'img/ground.png');
+
+        this.load.audio('snd_bite', 'sound/bite.mp3');
     }
 
     create() {
+
+        this.sfx = {
+            bite: this.sound.add('snd_bite')
+        }
 
         // Creating animations
         this.anims.create({
@@ -28,6 +37,17 @@ class SceneMain extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers('spr_player', {start:2, end:3}),
             frameRate: 3
         });
+        this.anims.create({
+            key: 'spr_diverIdle',
+            frames: [{key: 'spr_diver', frame: 0}],
+            frameRate: 5
+        });
+        this.anims.create({
+            key: 'spr_diverDie',
+            frames: this.anims.generateFrameNumbers('spr_diver', {start:1, end:5}),
+            frameRate: 3
+        });
+
 
 
 
@@ -46,6 +66,13 @@ class SceneMain extends Phaser.Scene {
         // Adding diver and ground collisions
         this.physics.add.collider(this.divers, this.ground, function(diver, ground) {
             diver.startMoving();
+        });
+
+        // Player eatting divers
+        this.physics.add.overlap(this.player, this.divers, function(player, diver) {
+            if (!player.canBite && !player.bitten) {
+                player.eatDiver(diver);
+            }
         });
 
 
