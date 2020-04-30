@@ -41,7 +41,9 @@ class SceneMain extends Phaser.Scene {
 
 
         // Adding diver and ground collisions
-        this.physics.add.collider(this.divers, this.ground);
+        this.physics.add.collider(this.divers, this.ground, function(diver, ground) {
+            diver.startMoving();
+        });
 
 
 

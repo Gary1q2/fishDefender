@@ -14,7 +14,16 @@ class Diver extends Entity {
 
         this.body.setGravityY(20);
 
+        this.speed = 1 * 60;
+    }
 
+    // Start moving diver
+    startMoving() {
+        if (this.x < this.scene.game.config.width/2) {
+            this.body.setVelocityX(this.speed);
+        } else {
+            this.body.setVelocityX(-this.speed);
+        }
     }
 }
 
@@ -61,7 +70,6 @@ class Player extends Entity {
         var angle = Math.atan2(distY, distX);
         this.body.setVelocity(this.speed * Math.cos(angle), this.speed * Math.sin(angle));
         this.angle = Phaser.Math.Angle.Between(this.x, this.y, this.targetX, this.targetY) * 180/Math.PI;
-        console.log("angle = " + this.angle);
     }
 
     update() {
