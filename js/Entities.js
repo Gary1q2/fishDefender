@@ -8,6 +8,7 @@ class Entity extends Phaser.GameObjects.Sprite {
     }
 }
 
+
 class Diver extends Entity {
     constructor(scene, x, y, key) {
         super(scene, x, y, key, 'diver');
@@ -16,14 +17,27 @@ class Diver extends Entity {
         this.body.setGravityY(20);
 
         this.speed = 0.25 * 60;
+
+        this.dead = false;
+
+        this.moving = false;
     }
 
+
     die() {
-        this.destroy();
+        this.dead = true;
+        this.body.setVelocityX(0);
+        this.play('spr_diverDie');
+        this.scene.sfx.die.play();
+        this.once('animationcomplete', function() {
+            this.destroy();
+        });   
     }
 
     // Start moving diver
     startMoving() {
+        this.moving = true;
+
         if (this.x < this.scene.game.config.width/2) {
             this.body.setVelocityX(this.speed);
         } else {
