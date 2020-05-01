@@ -8,21 +8,60 @@ class Entity extends Phaser.GameObjects.Sprite {
     }
 }
 
+class Chest extends Entity {
+    constructor(scene, x, y, key) {
+        super(scene, x, y, key);
+        this.money = 100;
+
+        this.displayMoney = this.scene.add.text(this.x, this.y-20, this.money);
+    }
+
+    update() {
+
+        this.displayMoney.setText(this.money);
+
+        if (this.money <= 0) {
+            this.destroy();
+        }
+    }
+
+}
 
 class Diver extends Entity {
     constructor(scene, x, y, key) {
         super(scene, x, y, key, 'diver');
 
         this.play('spr_diverIdle');
-        this.body.setGravityY(20);
+        this.body.setGravityY(70);
 
-        this.speed = 0.25 * 60;
+        this.speed = 1 * 60;
 
         this.dead = false;
 
         this.moving = false;
+
+        this.hp = 20;
+
+
+        this.plundering = false;
+
+        this.plunderTimer = 0;
+        this.plunderTime = 60;
+
+        this.plunderValue = 2;
     }
 
+    // Diving taking the chest money
+    plunder(chest) {
+        this.plundering = true;
+        this.plunderTimer = this.plunderTime;
+        chest.money -= this.plunderValue;
+    }
+
+    // Take damage
+    takeDmg(dmg) {
+        this.hp -= dmg;
+    }
 
     die() {
         this.dead = true;
@@ -45,22 +84,27 @@ class Diver extends Entity {
             this.flipX = true;
         }
     }
-}
 
-
-
-class BiteCollision extends Entity {
-    constructor(scene, x, y, key, player) {
-        super(scene, x, y, key);
-        this.owner = player;
-
+    // Stop moving
+    stopMoving() {
+        this.moving = false;
+        this.body.setVelocityX(0);
     }
 
     update() {
-        this.x = player.x;
-        this.y = player.y;
+        if (this.dead == false && this.hp <= 0) {
+            this.die();
+        }
+
+        if (this.plunderTimer > 0) {
+            this.plunderTimer--;
+            if (this.plunderTimer == 0) {
+                this.plundering = false;
+            }
+        }
     }
 }
+
 
 
 class Player extends Entity {
@@ -83,22 +127,20 @@ class Player extends Entity {
     // Player ate a diver
     eatDiver(diver) {
         this.bitten = true;
-        diver.die();
+        diver.takeDmg(5);
     }
 
     // Make fish bite
     bite() {
-        if (this.canBite) {
-            this.canBite = false;
-            this.play('spr_playerBite');
-            this.scene.sfx.bite.play();
+        this.canBite = false;
+        this.play('spr_playerBite');
+        this.scene.sfx.bite.play();
 
-            this.once('animationcomplete', function() {
-                this.canBite = true;
-                this.bitten = false;
-                this.play('spr_playerIdle');
-            });       
-        }
+        this.once('animationcomplete', function() {
+            this.canBite = true;
+            this.bitten = false;
+            this.play('spr_playerIdle');
+        });       
     }
 
 

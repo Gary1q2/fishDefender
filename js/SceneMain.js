@@ -22,6 +22,10 @@ class SceneMain extends Phaser.Scene {
 
     create() {
 
+        //this.game.oncontextmenu = function(e) {
+        //    e.preventDefault();
+        //}
+
         this.sfx = {
             bite: this.sound.add('snd_bite'),
             die: this.sound.add('snd_diverDie')
@@ -61,7 +65,7 @@ class SceneMain extends Phaser.Scene {
         this.ground = this.physics.add.staticGroup();
         this.ground.create(this.game.config.width/2, this.game.config.height-25, 'spr_ground');
 
-        this.chest = this.add.sprite(this.game.config.width/2, this.game.config.height-55, 'spr_chest');
+        this.chest = new Chest(this, this.game.config.width/2, this.game.config.height-55, 'spr_chest');
         this.player = new Player(this, this.game.config.width/2, this.game.config.height/2, 'spr_player');
 
 
@@ -79,6 +83,16 @@ class SceneMain extends Phaser.Scene {
             }
         });
 
+        // Diver reaching chest
+        this.physics.add.overlap(this.divers, this.chest, function(diver, chest) {
+            if (diver.moving == true) {
+                diver.stopMoving();
+            }
+            if (diver.plundering == false && diver.plunderTimer == 0) {
+                diver.plunder(chest);
+            }
+        });
+
 
 
         // Timer that spawns divers
@@ -86,7 +100,7 @@ class SceneMain extends Phaser.Scene {
             delay: 1000,
             callback: function() {
                 var spawnBuffer = 20;
-                var diver = new Diver(this, (Math.random() <= 0.5) ? spawnBuffer : this.game.config.width-spawnBuffer, 0, 'spr_diver');
+                var diver = new Diver(this, (Math.random() <= 0.5) ? spawnBuffer : this.game.config.width-spawnBuffer, 100, 'spr_diver');
                 this.divers.add(diver);
             },
             callbackScope: this,
@@ -105,25 +119,49 @@ class SceneMain extends Phaser.Scene {
 
 
         // Display FPS
-        this.fps = this.add.text(5, 5, this.game.loop.actualFps);
+        this.fps = this.add.text(5, 5, -1);
 
         this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+
+        this.testNum = 0;
+        this.test = this.add.text(50, 50, -1);
 
     }
 
     update() {
-        this.player.update();
 
-        // Detect mouse click
+        // Update entities
+        this.player.update();
+        this.chest.update();
+        for (var i = 0; i < this.divers.getChildren().length; i++) {
+            this.divers.getChildren()[i].update();
+        }
+
+
+        // ========================
+        // Detecting input
+        // ========================
+
+        // Clicking to move
         var mouse = this.input.activePointer
         if (mouse.isDown) {
             this.player.moveTo(Math.round(mouse.x), Math.round(mouse.y));
         }
 
-        // Detect Q key pressed
+        // Pressing Q to bite
         if (this.keyQ.isDown) {
             console.log("pressed Q");
-            this.player.bite();
+            if (this.player.canBite) {
+                this.player.bite();  
+            }
         }
+
+
+
+
+
+        // Update text
+        this.test.setText(this.testNum++);
+        this.fps.setText(Math.round(this.game.loop.actualFps));
     }
 }
