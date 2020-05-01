@@ -8,6 +8,23 @@ class Entity extends Phaser.GameObjects.Sprite {
     }
 }
 
+class PlunderNum extends Entity {
+    constructor(scene, x, y, key, text) {
+        super(scene, x, y, key);
+
+        this.liveTimer = 100;
+        this.body.setVelocityY(-50);
+    }
+
+    update() {
+        this.liveTimer--;
+        if (this.liveTimer <= 0) {
+            this.destroy();
+        }
+    }
+}
+
+
 class Chest extends Entity {
     constructor(scene, x, y, key) {
         super(scene, x, y, key);
@@ -35,7 +52,7 @@ class Diver extends Entity {
         this.play('spr_diverIdle');
         this.body.setGravityY(70);
 
-        this.speed = 1 * 60;
+        this.speed = 0.25 * 60;
 
         this.dead = false;
 
@@ -57,11 +74,32 @@ class Diver extends Entity {
         this.plundering = true;
         this.plunderTimer = this.plunderTime;
         chest.money -= this.plunderValue;
+        this.scene.sfx.plunder.play();
+        this.play('spr_diverPlunder');
+
+        this.scene.plunderNums.add(new PlunderNum(this.scene, this.x, this.y, "spr_plunderNum"));
+
+        this.once('animationcomplete', function() {
+            if (this.moving == false) {
+                this.play('spr_diverIdle');
+            } else {
+                this.play('spr_diverWalk');
+            }
+        });   
     }
 
     // Take damage
     takeDmg(dmg) {
         this.hp -= dmg;
+
+        this.play('spr_diverHurt');
+        this.once('animationcomplete', function() {
+            if (this.moving == false) {
+                this.play('spr_diverIdle');
+            } else {
+                this.play('spr_diverWalk');
+            }
+        });  
     }
 
     die() {
@@ -78,6 +116,7 @@ class Diver extends Entity {
     startMoving() {
         this.moving = true;
 
+        this.play('spr_diverWalk');
         if (this.x < this.scene.game.config.width/2) {
             this.body.setVelocityX(this.speed);
         } else {
@@ -90,6 +129,7 @@ class Diver extends Entity {
     stopMoving() {
         this.moving = false;
         this.body.setVelocityX(0);
+        this.play('spr_diverIdle');
     }
 
     update() {
@@ -150,6 +190,7 @@ class Player extends Entity {
         this.targetX = -1;
         this.targetY = -1;
         this.body.setVelocity(0, 0);
+        this.play('spr_playerIdle');
     }
 
 
@@ -171,6 +212,12 @@ class Player extends Entity {
         var angle = Math.atan2(distY, distX);
         this.body.setVelocity(this.speed * Math.cos(angle), this.speed * Math.sin(angle));
         this.angle = Phaser.Math.Angle.Between(this.x, this.y, this.targetX, this.targetY) * 180/Math.PI;
+
+        console.log(this);
+        console.log(this.anims.currentAnim);
+        if (this.anims.currentAnim.key != 'spr_playerSwim' && this.anims.currentAnim.key != 'spr_playerBite') {
+            this.play('spr_playerSwim');
+        }
     }
 
     update() {

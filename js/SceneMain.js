@@ -15,9 +15,11 @@ class SceneMain extends Phaser.Scene {
         this.load.image('spr_chest', 'img/chest.png');
         this.load.image('spr_background', 'img/background.png');
         this.load.image('spr_ground', 'img/ground.png');
+        this.load.image('spr_plunderNum', 'img/plunderNum.png');
 
         this.load.audio('snd_bite', 'sound/bite.mp3');
         this.load.audio('snd_diverDie', 'sound/diverDie.mp3');
+        this.load.audio('snd_plunder', 'sound/plunder.mp3');
     }
 
     create() {
@@ -28,7 +30,8 @@ class SceneMain extends Phaser.Scene {
 
         this.sfx = {
             bite: this.sound.add('snd_bite'),
-            die: this.sound.add('snd_diverDie')
+            die: this.sound.add('snd_diverDie'),
+            plunder: this.sound.add('snd_plunder')
         }
 
         // Creating animations
@@ -39,18 +42,42 @@ class SceneMain extends Phaser.Scene {
             repeat: -1
         });
         this.anims.create({
-            key: 'spr_playerBite',
+            key: 'spr_playerSwim',
             frames: this.anims.generateFrameNumbers('spr_player', {start:2, end:3}),
+            frameRate: 6,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'spr_playerBite',
+            frames: this.anims.generateFrameNumbers('spr_player', {start:4, end:5}),
             frameRate: 3
         });
+
         this.anims.create({
             key: 'spr_diverIdle',
             frames: [{key: 'spr_diver', frame: 0}],
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'spr_diverWalk',
+            frames: this.anims.generateFrameNumbers('spr_diver', {start:0, end:1}),
+            frameRate: 3,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'spr_diverHurt',
+            frames: [{key: 'spr_diver', frame: 2}],
+            frameRate: 2
+        });
+        this.anims.create({
+            key: 'spr_diverPlunder',
+            frames: [{key: 'spr_diver', frame: 3}],
             frameRate: 5
         });
         this.anims.create({
             key: 'spr_diverDie',
-            frames: this.anims.generateFrameNumbers('spr_diver', {start:1, end:5}),
+            frames: this.anims.generateFrameNumbers('spr_diver', {start:4, end:8}),
             frameRate: 10
         });
 
@@ -59,6 +86,8 @@ class SceneMain extends Phaser.Scene {
 
         // Groups for entities
         this.divers = this.add.group();
+        this.plunderNums = this.add.group();
+
 
         this.background = this.add.sprite(this.game.config.width/2, this.game.config.height/2, 'spr_background');
 
@@ -94,22 +123,6 @@ class SceneMain extends Phaser.Scene {
         });
 
 
-
-        // Timer that spawns divers
-        this.time.addEvent({
-            delay: 1000,
-            callback: function() {
-                var spawnBuffer = 20;
-                var diver = new Diver(this, (Math.random() <= 0.5) ? spawnBuffer : this.game.config.width-spawnBuffer, 100, 'spr_diver');
-                this.divers.add(diver);
-            },
-            callbackScope: this,
-            loop: true
-        });
-
-
-
-
         // Mouse inputs
         this.input.on('pointerup', function(pointer) {
             console.log('up');
@@ -126,15 +139,34 @@ class SceneMain extends Phaser.Scene {
         this.testNum = 0;
         this.test = this.add.text(50, 50, -1);
 
+        this.spawnDiverTimer = 60;
     }
 
     update() {
+
+        // Timer to spawn divers
+        if (this.spawnDiverTimer > 0) {
+            this.spawnDiverTimer--;
+            if (this.spawnDiverTimer == 0) {
+                var spawnBuffer = 20;
+                var diver = new Diver(this, (Math.random() <= 0.5) ? spawnBuffer : this.game.config.width-spawnBuffer, 100, 'spr_diver');
+                this.divers.add(diver);  
+
+                this.spawnDiverTimer = (2*60 + Math.round(4*60 * Math.random()));           
+            }
+        }
+
+
+
 
         // Update entities
         this.player.update();
         this.chest.update();
         for (var i = 0; i < this.divers.getChildren().length; i++) {
             this.divers.getChildren()[i].update();
+        }
+        for (var i = 0; i < this.plunderNums.getChildren().length; i++) {
+            this.plunderNums.getChildren()[i].update();
         }
 
 
