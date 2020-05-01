@@ -21,6 +21,7 @@ class Chest extends Entity {
         this.displayMoney.setText(this.money);
 
         if (this.money <= 0) {
+            this.scene.scene.start("SceneGameOver");
             this.destroy();
         }
     }

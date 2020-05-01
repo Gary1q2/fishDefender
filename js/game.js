@@ -10,7 +10,8 @@ var config = {
         }
     },
     scene: [
-        SceneMain
+        SceneMain,
+        SceneGameOver
     ],
     zoom: 4,
     pixelArt: true,
